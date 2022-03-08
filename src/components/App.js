@@ -1,18 +1,38 @@
-import React from "react";
-import { useState } from "react";
+import React from 'react';
+import SearchBar from './SearchBar';
+import youtube from '../apis/youtube';
+import VideoList from './VideoList';
 
 
-import SearchBar from "./SearchBar";
+const KEY = 'AIzaSyCN6e98GjAfa_d4E4mISSn8uCP6g5b1DvE';
 
-function App() {
+class App extends React.Component {
 
-  
-  return (
-   <div className="ui container">
-      <SearchBar />
-      
-    </div>
-  );
+  state = {response : []};
+  onTermSubmit = async (term) => {
+    
+    const res = await youtube.get('/search', {
+      params: {
+        q: term,
+        part: 'snippet',
+        maxResults: 5,
+        type: 'video',
+        key: KEY,
+      },
+    });
+    this.setState({response: res.data.items});
+    
+  };
+  render() {
+    return (
+      <div className="ui container">
+        <SearchBar onFormSubmit={this.onTermSubmit} />
+        <p>{this.state.response.length}</p>
+
+        <VideoList videos={this.state.response}/>
+      </div>
+    );
+  }
 }
 
 export default App;
